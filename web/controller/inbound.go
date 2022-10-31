@@ -42,7 +42,7 @@ func (a *InboundController) startTask() {
 		if a.xrayService.IsNeedRestartAndSetFalse() {
 			err := a.xrayService.RestartXray(false)
 			if err != nil {
-				logger.Error("راه اندازی مجدد ناموفق بود:", err)
+				logger.Error(" راه اندازی مجدد ناموفق بود: ", err)
 			}
 		}
 	})
@@ -68,7 +68,7 @@ func (a *InboundController) addInbound(c *gin.Context) {
 	user := session.GetLoginUser(c)
 	inbound.UserId = user.Id
 	inbound.Enable = true
-	inbound.Tag = fmt.Sprintf("inbound-%v", inbound.Port)
+	inbound.Tag = fmt.Sprintf("inbound-%v", inbound.Id)
 	err = a.inboundService.AddInbound(inbound)
 	jsonMsg(c, "ایجاد", err)
 	if err == nil {
@@ -92,7 +92,7 @@ func (a *InboundController) delInbound(c *gin.Context) {
 func (a *InboundController) updateInbound(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		jsonMsg(c, "انصراف", err)
+		jsonMsg(c, "ویرایش", err)
 		return
 	}
 	inbound := &model.Inbound{
@@ -100,11 +100,11 @@ func (a *InboundController) updateInbound(c *gin.Context) {
 	}
 	err = c.ShouldBind(inbound)
 	if err != nil {
-		jsonMsg(c, "انصراف", err)
+		jsonMsg(c, "ویرایش", err)
 		return
 	}
 	err = a.inboundService.UpdateInbound(inbound)
-	jsonMsg(c, "انصراف", err)
+	jsonMsg(c, "ویرایش", err)
 	if err == nil {
 		a.xrayService.SetToNeedRestart()
 	}
@@ -124,7 +124,7 @@ func (a *InboundController) clearClientIps(c *gin.Context) {
 
 	err := a.inboundService.ClearClientIps(email)
 	if err != nil {
-		jsonMsg(c, "انصراف", err)
+		jsonMsg(c, "ویرایش", err)
 		return
 	}
 	jsonMsg(c, "پاک کردن گزارش", nil)
