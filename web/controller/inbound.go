@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"strconv"
 	"x-ui/database/model"
 	"x-ui/logger"
@@ -68,7 +67,6 @@ func (a *InboundController) addInbound(c *gin.Context) {
 	user := session.GetLoginUser(c)
 	inbound.UserId = user.Id
 	inbound.Enable = true
-	inbound.Tag = fmt.Sprintf("inbound-%v", inbound.Id)
 	err = a.inboundService.AddInbound(inbound)
 	jsonMsg(c, "ایجاد", err)
 	if err == nil {
@@ -109,6 +107,7 @@ func (a *InboundController) updateInbound(c *gin.Context) {
 		a.xrayService.SetToNeedRestart()
 	}
 }
+
 func (a *InboundController) getClientIps(c *gin.Context) {
 	email := c.Param("email")
 
