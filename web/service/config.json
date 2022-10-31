@@ -7,6 +7,12 @@
     ],
     "tag": "api"
   },
+  "log": {
+    "access": "/usr/local/x-ui/bin/access.log",
+    "error": "/usr/local/x-ui/bin/error.log",
+    "loglevel": "warning",
+    "dnsLog": false
+  },
   "dns": {
     "hosts": {
       "dns.google": [
