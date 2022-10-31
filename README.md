@@ -20,26 +20,19 @@ x-ui یک پانل xray با پشتیبانی از چند پروتکل چند ک
 ````
 bash <(curl -Ls https://raw.githubusercontent.com/MrCenTury/x-ui-fa/master/install.sh)
 ````
+نحوه استفاده ربات:
+- 30 * * * * * // در 30 ثانیه هر نقطه اطلاع دهید
+- @hourly // اعلان های ساعتی
+- @daily // اطلاع رسانی روزانه (00:00 صبح)
+- @هر 8 ساعت // اعلان هر 8 ساعت
 
-- Tg Robot Token
-- Tg Robot ChatId
-- Tg robot cycle runtime, in crontab syntax
+محتوای اعلان ربات:
+- استفاده از ترافیک گره
+- یادآوری ورود به پنل
+- یادآوری انقضای گره
+- یادآوری هشدار ترافیک
 
-Reference syntax:
-- 30 * * * * * //Notify at the 30s of each point
-- @hourly // hourly notifications
-- @daily // Daily notification (00:00 AM)
-- @every 8h // Notification every 8 hours
-
-TG notification content:
-- Node traffic usage
-- Panel login reminder
-- Node expiration reminder
-- Traffic warning reminder
-
-More features are planned...
-## suggestion system
-
+## سیستم پیشنهاد
 - CentOS 7+
 - Ubuntu 16+
 - Debian 8+
