@@ -18,7 +18,7 @@ x-ui یک پانل xray با پشتیبانی از چند پروتکل چند ک
 # نصب و ارتقا دهید
 
 ````
-bash <(curl -Ls https://raw.githubusercontent.com/MrCenTury/x-ui-fa/main/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/MrCenTury/x-ui-fa/master/install.sh)
 ````
 
 - Tg Robot Token
