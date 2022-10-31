@@ -79,9 +79,10 @@
                                     </template>
                                     <a-icon type="question-circle" theme="filled"></a-icon>
                                 </a-tooltip>
-                                <a-tag color="blue" @click="RestartV2ray">راه اندازی مجدد</a-tag>
                                 <a-tag color="green" @click="openSelectV2rayVersion">[[ status.xray.version ]]</a-tag>
                                 <a-tag color="blue" @click="openSelectV2rayVersion">تغییر ورژن</a-tag>
+                                <a-tag color="blue" @click="RestartV2ray">راه اندازی مجدد</a-tag>
+
                             </a-card>
                         </a-col>
                         <a-col :sm="24" :md="12">
@@ -98,7 +99,7 @@
                         </a-col>
                         <a-col :sm="24" :md="12">
                             <a-card hoverable>
-                                پردازش سیستم: [[ status.loads[0] ]] | [[ status.loads[1] ]] | [[ status.loads[2] ]]
+                                 [[ status.loads[0] ]] | [[ status.loads[1] ]] | [[ status.loads[2] ]] :پردازش سیستم
                             </a-card>
                         </a-col>
                         <a-col :sm="24" :md="12">
@@ -168,7 +169,7 @@
                 </transition>
             </a-layout-content>
         </a-layout>
-        <a-modal id="version-modal" v-model="versionModal.visible" title="تغییر ورژن" :closable="true"
+        <a-modal id="version-modal" v-model="versionModal.visible" title="تغییر نسخه" :closable="true"
             @ok="() => versionModal.visible = false" ok-text="OK" cancel-text="Cancel">
             <h2>روی نسخه ای که می خواهید تغییر دهید کلیک کنید</h2>
             <h2>لطفاً با دقت انتخاب کنید، نسخه‌های قدیمی‌تر ممکن است تنظیمات ناسازگاری داشته باشند</h2>
@@ -184,9 +185,9 @@
     <script>
 
         const State = {
-            Running: "در حال اجرا",
-            Stop: "توقف شده",
-            Error: "خطا (بررسی کنید)",
+            Running: "running",
+            Stop: "stop",
+            Error: "error",
         }
         Object.freeze(State);
 
@@ -297,14 +298,13 @@
                     this.status = new Status(data);
                 },
                 async RestartV2ray() {
-                this.loading(true);
-                const msg = await HttpUtil.post("/xui/setting/restartPanel");                
+                this.loading(true);            
+                const msg = await HttpUtil.post("/xui/setting/restartPanel");    
                 this.loading(false);
                     if (!msg.success) {
                         return;
                         location.reload();
                     }
-                    versionModal.show(msg.obj);
                 },
                 async openSelectV2rayVersion() {
                     this.loading(true);
