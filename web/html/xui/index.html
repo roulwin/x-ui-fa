@@ -35,7 +35,7 @@
                                                 :stroke-color="status.mem.color" :percent="status.mem.percent">
                                             </a-progress>
                                             <div>
-                                                حافظه جانبی: [[ sizeFormat(status.mem.current) ]] / [[
+                                                حافظه Ram: [[ sizeFormat(status.mem.current) ]] / [[
                                                 sizeFormat(status.mem.total) ]]
                                             </div>
                                         </a-col>
@@ -48,7 +48,7 @@
                                                 :stroke-color="status.swap.color" :percent="status.swap.percent">
                                             </a-progress>
                                             <div>
-                                                ]فضای swap: [[ sizeFormat(status.swap.current) ]] / [[
+                                                فضای swap: [[ sizeFormat(status.swap.current) ]] / [[
                                                 sizeFormat(status.swap.total) ]]
                                             </div>
                                         </a-col>
@@ -57,7 +57,7 @@
                                                 :stroke-color="status.disk.color" :percent="status.disk.percent">
                                             </a-progress>
                                             <div>
-                                                فضای داخلی: [[ sizeFormat(status.disk.current) ]] / [[
+                                                فضای Hard: [[ sizeFormat(status.disk.current) ]] / [[
                                                 sizeFormat(status.disk.total) ]]
                                             </div>
                                         </a-col>
@@ -79,6 +79,7 @@
                                     </template>
                                     <a-icon type="question-circle" theme="filled"></a-icon>
                                 </a-tooltip>
+                                <a-tag color="blue" @click="RestartV2ray">راه اندازی مجدد</a-tag>
                                 <a-tag color="green" @click="openSelectV2rayVersion">[[ status.xray.version ]]</a-tag>
                                 <a-tag color="blue" @click="openSelectV2rayVersion">تغییر ورژن</a-tag>
                             </a-card>
@@ -183,9 +184,9 @@
     <script>
 
         const State = {
-            Running: "running",
-            Stop: "stop",
-            Error: "error",
+            Running: "در حال اجرا",
+            Stop: "توقف شده",
+            Error: "خطا (بررسی کنید)",
         }
         Object.freeze(State);
 
@@ -294,6 +295,16 @@
                 },
                 setStatus(data) {
                     this.status = new Status(data);
+                },
+                async RestartV2ray() {
+                this.loading(true);
+                const msg = await HttpUtil.post("/xui/setting/restartPanel");                
+                this.loading(false);
+                    if (!msg.success) {
+                        return;
+                        location.reload();
+                    }
+                    versionModal.show(msg.obj);
                 },
                 async openSelectV2rayVersion() {
                     this.loading(true);
