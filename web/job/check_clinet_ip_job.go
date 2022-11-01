@@ -1,25 +1,26 @@
 package job
 
 import (
-	"x-ui/logger"
-	"x-ui/web/service"
+	"encoding/json"
+	"os"
+	"regexp"
+	"strconv"
+	ss "strings"
 	"x-ui/database"
 	"x-ui/database/model"
-    "os"
- 	ss "strings"
-	"regexp"
-    "encoding/json"
-	"gorm.io/gorm"
-    "strconv"
+	"x-ui/logger"
+	"x-ui/web/service"
 
+	"gorm.io/gorm"
 )
 
 type CheckClientIpJob struct {
 	xrayService    service.XrayService
 	inboundService service.InboundService
 }
+
 var job *CheckClientIpJob
-  
+
 func NewCheckClientIpJob() *CheckClientIpJob {
 	job = new(CheckClientIpJob)
 	return job
@@ -31,78 +32,75 @@ func (j *CheckClientIpJob) Run() {
 
 func processLogFile() {
 	accessLogPath := GetAccessLogPath()
-	if(accessLogPath == "") {
+	if accessLogPath == "" {
 		logger.Warning("xray log not init in config.json")
 		return
 	}
 
-    data, err := os.ReadFile(accessLogPath)
+	data, err := os.ReadFile(accessLogPath)
 	InboundClientIps := make(map[string][]string)
-    checkError(err)
+	checkError(err)
 
 	// clean log
 	if err := os.Truncate(GetAccessLogPath(), 0); err != nil {
 		checkError(err)
 	}
-	
+
 	lines := ss.Split(string(data), "\n")
 	for _, line := range lines {
 		ipRegx, _ := regexp.Compile(`[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+`)
 		emailRegx, _ := regexp.Compile(`email:.+`)
 
 		matchesIp := ipRegx.FindString(line)
-		if(len(matchesIp) > 0) {
+		if len(matchesIp) > 0 {
 			ip := string(matchesIp)
-			if( ip == "127.0.0.1" || ip == "1.1.1.1") {
+			if ip == "127.0.0.1" || ip == "1.1.1.1" {
 				continue
 			}
 
 			matchesEmail := emailRegx.FindString(line)
-			if(matchesEmail == "") {
+			if matchesEmail == "" {
 				continue
 			}
 			matchesEmail = ss.Split(matchesEmail, "email: ")[1]
-	
-			if(InboundClientIps[matchesEmail] != nil) {
-				if(contains(InboundClientIps[matchesEmail],ip)){
+
+			if InboundClientIps[matchesEmail] != nil {
+				if contains(InboundClientIps[matchesEmail], ip) {
 					continue
 				}
-				InboundClientIps[matchesEmail] = append(InboundClientIps[matchesEmail],ip)
+				InboundClientIps[matchesEmail] = append(InboundClientIps[matchesEmail], ip)
 
-				
-
-			}else{
-			InboundClientIps[matchesEmail] = append(InboundClientIps[matchesEmail],ip)
-		}
+			} else {
+				InboundClientIps[matchesEmail] = append(InboundClientIps[matchesEmail], ip)
+			}
 		}
 
 	}
 	for clientEmail, ips := range InboundClientIps {
-		inboundClientIps,err := GetInboundClientIps(clientEmail)
-		if(err != nil){
-			addInboundClientIps(clientEmail,ips)
+		inboundClientIps, err := GetInboundClientIps(clientEmail)
+		if err != nil {
+			addInboundClientIps(clientEmail, ips)
 
-		}else{
-			updateInboundClientIps(inboundClientIps,clientEmail,ips)
+		} else {
+			updateInboundClientIps(inboundClientIps, clientEmail, ips)
 		}
-			
-	}
 
+	}
 
 }
 func GetAccessLogPath() string {
-	
-    config, err := os.ReadFile("bin/config.json")
-    checkError(err)
+
+	config, err := os.ReadFile("bin/config.json")
+	checkError(err)
 
 	jsonConfig := map[string]interface{}{}
-    err = json.Unmarshal([]byte(config), &jsonConfig)
-    if err != nil {
-        logger.Warning(err)
-    }
-	if(jsonConfig["log"] != nil) {
+	err = json.Unmarshal([]byte(config), &jsonConfig)
+	if err != nil {
+		logger.Warning(err)
+	}
+	if jsonConfig["log"] != nil {
 		jsonLog := jsonConfig["log"].(map[string]interface{})
-		if(jsonLog["access"] != nil) {
+		if jsonLog["access"] != nil {
 
 			accessLogPath := jsonLog["access"].(string)
 
@@ -113,7 +111,7 @@ func GetAccessLogPath() string {
 
 }
 func checkError(e error) {
-    if e != nil {
+	if e != nil {
 		logger.Warning("client ip job err:", e)
 	}
 }
@@ -126,20 +124,21 @@ func contains(s []string, str string) bool {
 
 	return false
 }
+
 // https://codereview.stackexchange.com/a/192954
 func Unique(slice []string) []string {
-    // create a map with all the values as key
-    uniqMap := make(map[string]struct{})
-    for _, v := range slice {
-        uniqMap[v] = struct{}{}
-    }
+	// create a map with all the values as key
+	uniqMap := make(map[string]struct{})
+	for _, v := range slice {
+		uniqMap[v] = struct{}{}
+	}
 
-    // turn the map keys into a slice
-    uniqSlice := make([]string, 0, len(uniqMap))
-    for v := range uniqMap {
-        uniqSlice = append(uniqSlice, v)
-    }
-    return uniqSlice
+	// turn the map keys into a slice
+	uniqSlice := make([]string, 0, len(uniqMap))
+	for v := range uniqMap {
+		uniqSlice = append(uniqSlice, v)
+	}
+	return uniqSlice
 }
 
 func GetInboundClientIps(clientEmail string) (*model.InboundClientIps, error) {
@@ -151,14 +150,13 @@ func GetInboundClientIps(clientEmail string) (*model.InboundClientIps, error) {
 	}
 	return InboundClientIps, nil
 }
-func addInboundClientIps(clientEmail string,ips []string) error {
+func addInboundClientIps(clientEmail string, ips []string) error {
 	inboundClientIps := &model.InboundClientIps{}
-    jsonIps, err := json.Marshal(ips)
+	jsonIps, err := json.Marshal(ips)
 	checkError(err)
 
 	inboundClientIps.ClientEmail = clientEmail
 	inboundClientIps.Ips = string(jsonIps)
-	
 
 	db := database.GetDB()
 	tx := db.Begin()
@@ -177,25 +175,24 @@ func addInboundClientIps(clientEmail string,ips []string) error {
 	}
 	return nil
 }
-func updateInboundClientIps(inboundClientIps *model.InboundClientIps,clientEmail string,ips []string) error {
+func updateInboundClientIps(inboundClientIps *model.InboundClientIps, clientEmail string, ips []string) error {
 
-    jsonIps, err := json.Marshal(ips)
+	jsonIps, err := json.Marshal(ips)
 	checkError(err)
 
 	inboundClientIps.ClientEmail = clientEmail
 	inboundClientIps.Ips = string(jsonIps)
-	
+
 	// check inbound limitation
 	inbound, _ := GetInboundByEmail(clientEmail)
 
 	limitIpRegx, _ := regexp.Compile(`"limitIp": .+`)
 
 	limitIpMactch := limitIpRegx.FindString(inbound.Settings)
-	limitIpMactch =  ss.Split(limitIpMactch, `"limitIp": `)[1]
-    limitIp, err := strconv.Atoi(limitIpMactch)
+	limitIpMactch = ss.Split(limitIpMactch, `"limitIp": `)[1]
+	limitIp, err := strconv.Atoi(limitIpMactch)
 
-
-	if(limitIp < len(ips) && limitIp != 0 && inbound.Enable) {
+	if limitIp < len(ips) && limitIp != 0 && inbound.Enable {
 
 		DisableInbound(inbound.Id)
 	}
@@ -211,19 +208,20 @@ func updateInboundClientIps(inboundClientIps *model.InboundClientIps,clientEmail
 func GetInboundByEmail(clientEmail string) (*model.Inbound, error) {
 	db := database.GetDB()
 	var inbounds *model.Inbound
-	err := db.Model(model.Inbound{}).Where("settings LIKE ?", "%" + clientEmail + "%").Find(&inbounds).Error
+	err := db.Model(model.Inbound{}).Where("settings LIKE ?", "%"+clientEmail+"%").Find(&inbounds).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
 	}
 	return inbounds, nil
 }
-func DisableInbound(id int) error{
+func DisableInbound(id int) error {
 	db := database.GetDB()
 	result := db.Model(model.Inbound{}).
-		Where("id = ? and enable = ?", id, true).
-		Update("enable", false)
+		Where("id = ? and enable = ?", id, true)
+		//Update("enable", false)
+	logger.Warning("استفاده غیرمجاز از یوزر شماره: ", id).
 	err := result.Error
-	logger.Warning("disable inbound with id:",id)
+	logger.Warning("disable inbound with id:", id)
 
 	if err == nil {
 		job.xrayService.SetToNeedRestart()
