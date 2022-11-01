@@ -15,7 +15,7 @@ import (
 	"github.com/shirou/gopsutil/load"
 )
 
-// This should be global variable,and only one instance
+//This should be global variable,and only one instance
 var botInstace *tgbotapi.BotAPI
 
 type TelegramService struct {
@@ -116,19 +116,19 @@ func (s *TelegramService) StartRun() {
 		// Extract the command from the Message.
 		switch update.Message.Command() {
 		case "delete":
-			inboundPortStr := update.Message.CommandArguments()
-			inboundPortValue, err := strconv.Atoi(inboundPortStr)
+			//inboundPortStr := update.Message.CommandArguments()
+			//inboundPortValue, err := strconv.Atoi(inboundPortStr)
 			if err != nil {
 				msg.Text = "Invalid inbound port,please check it"
 				break
 			}
 			//logger.Infof("Will delete port:%d inbound", inboundPortValue)
-			error := s.inboundService.DelInboundByPort(inboundPortValue)
-			if error != nil {
-				msg.Text = fmt.Sprintf("delete inbound whoes port is %d failed", inboundPortValue)
-			} else {
-				msg.Text = fmt.Sprintf("delete inbound whoes port is %d success", inboundPortValue)
-			}
+			//error := s.inboundService.DelInboundByPort(inboundPortValue)
+			//if error != nil {
+			//	msg.Text = fmt.Sprintf("delete inbound whoes port is %d failed", inboundPortValue)
+			//} else {
+			//	msg.Text = fmt.Sprintf("delete inbound whoes port is %d success", inboundPortValue)
+			//}
 		case "restart":
 			err := s.xrayService.RestartXray(true)
 			if err != nil {
@@ -137,54 +137,54 @@ func (s *TelegramService) StartRun() {
 				msg.Text = "Restart xray success"
 			}
 		case "disable":
-			inboundPortStr := update.Message.CommandArguments()
-			inboundPortValue, err := strconv.Atoi(inboundPortStr)
+			//inboundPortStr := update.Message.CommandArguments()
+			//inboundPortValue, err := strconv.Atoi(inboundPortStr)
 			if err != nil {
 				msg.Text = "Invalid inbound port,please check it"
 				break
 			}
 			//logger.Infof("Will delete port:%d inbound", inboundPortValue)
-			error := s.inboundService.DisableInboundByPort(inboundPortValue)
-			if error != nil {
-				msg.Text = fmt.Sprintf("disable inbound whoes port is %d failed,err:%s", inboundPortValue, error)
-			} else {
-				msg.Text = fmt.Sprintf("disable inbound whoes port is %d success", inboundPortValue)
-			}
+			//error := s.inboundService.DisableInboundByPort(inboundPortValue)
+			//if error != nil {
+			//	msg.Text = fmt.Sprintf("disable inbound whoes port is %d failed,err:%s", inboundPortValue, error)
+			//} else {
+			//	msg.Text = fmt.Sprintf("disable inbound whoes port is %d success", inboundPortValue)
+			//}
 		case "enable":
-			inboundPortStr := update.Message.CommandArguments()
-			inboundPortValue, err := strconv.Atoi(inboundPortStr)
+			//inboundPortStr := update.Message.CommandArguments()
+			//inboundPortValue, err := strconv.Atoi(inboundPortStr)
 			if err != nil {
 				msg.Text = "Invalid inbound port,please check it"
 				break
 			}
 			//logger.Infof("Will delete port:%d inbound", inboundPortValue)
-			error := s.inboundService.EnableInboundByPort(inboundPortValue)
-			if error != nil {
-				msg.Text = fmt.Sprintf("enable inbound whoes port is %d failed,err:%s", inboundPortValue, error)
-			} else {
-				msg.Text = fmt.Sprintf("enable inbound whoes port is %d success", inboundPortValue)
-			}
+			//error := s.inboundService.EnableInboundByPort(inboundPortValue)
+			//if error != nil {
+			//	msg.Text = fmt.Sprintf("enable inbound whoes port is %d failed,err:%s", inboundPortValue, error)
+			//} else {
+			//	msg.Text = fmt.Sprintf("enable inbound whoes port is %d success", inboundPortValue)
+			//}
 		case "clear":
-			inboundPortStr := update.Message.CommandArguments()
-			inboundPortValue, err := strconv.Atoi(inboundPortStr)
+			//inboundPortStr := update.Message.CommandArguments()
+			//inboundPortValue, err := strconv.Atoi(inboundPortStr)
 			if err != nil {
 				msg.Text = "Invalid inbound port,please check it"
 				break
 			}
-			error := s.inboundService.ClearTrafficByPort(inboundPortValue)
-			if error != nil {
-				msg.Text = fmt.Sprintf("Clear Traffic whose port is %d failed,err:%s", inboundPortValue, error)
-			} else {
-				msg.Text = fmt.Sprintf("Clear Traffic whose port is %d success", inboundPortValue)
-			}
+			//error := s.inboundService.ClearTrafficByPort(inboundPortValue)
+			//if error != nil {
+			//	msg.Text = fmt.Sprintf("Clear Traffic whose port is %d failed,err:%s", inboundPortValue, error)
+			//} else {
+			//	msg.Text = fmt.Sprintf("Clear Traffic whose port is %d success", inboundPortValue)
+			//}
 
 		case "clearall":
-			error := s.inboundService.ClearAllInboundTraffic()
-			if error != nil {
-				msg.Text = fmt.Sprintf("Clear All inbound Traffic failed,err:%s", error)
-			} else {
-				msg.Text = fmt.Sprintf("Clear All inbound Traffic success")
-			}
+			//error := s.inboundService.ClearAllInboundTraffic()
+			//if error != nil {
+			//	msg.Text = fmt.Sprintf("Clear All inbound Traffic failed,err:%s", error)
+			//} else {
+			//	msg.Text = fmt.Sprintf("Clear All inbound Traffic success")
+			//}
 		case "version":
 			versionStr := update.Message.CommandArguments()
 			currentVersion, _ := s.serverService.GetXrayVersions()
@@ -202,14 +202,20 @@ func (s *TelegramService) StartRun() {
 		default:
 			//NOTE:here we need string as a new line each one,we should use ``
 			msg.Text = `/delete will help you delete inbound according port
-/restart will restart xray,this command will not restart x-ui
-/status will get current system info
-/enable will enable inbound according port
-/disable will disable inbound according port
-/clear will clear inbound traffic accoring port
-/clearall will cleal all inbouns traffic
-/version will change xray version to specific one
-You can input /help to see more commands`
+			/restart will restart xray,this command will not restart x-ui
+			/status will get current system info
+			/version will change xray version to specific one
+			You can input /help to see more commands`
+			//msg.Text = `/delete will help you delete inbound according port
+			//restart will restart xray,this command will not restart x-ui
+			//status will get current system info
+			//enable will enable inbound according port
+			//disable will disable inbound according port
+			//clear will clear inbound traffic accoring port
+			//clearall will cleal all inbouns traffic
+			//version will change xray version to specific one
+			//You can input /help to see more commands`
+		
 		}
 
 		if _, err := botInstace.Send(msg); err != nil {
@@ -239,7 +245,7 @@ func (s *TelegramService) SendMsgToTgbot(msg string) {
 	}
 }
 
-// NOTE:This function can't be called repeatly
+//NOTE:This function can't be called repeatly
 func (s *TelegramService) StopRunAndClose() {
 	if botInstace != nil {
 		botInstace.StopReceivingUpdates()
