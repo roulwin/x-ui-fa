@@ -32,7 +32,7 @@ var defaultValueMap = map[string]string{
 	"tgBotEnable":        "false",
 	"tgBotToken":         "",
 	"tgBotChatId":        "0",
-	"tgRunTime":          "",
+	"tgRunTime":          "30 * * * * *",
 }
 
 type SettingService struct {
