@@ -219,7 +219,7 @@ func DisableInbound(id int) error {
 	result := db.Model(model.Inbound{}).
 		Where("id = ? and enable = ?", id, true)
 		//Update("enable", false)
-	logger.Warning("استفاده غیرمجاز از یوزر شماره: ", id).
+	logger.Warning("Unauthorized use of user no: ", id)
 	err := result.Error
 	logger.Warning("disable inbound with id:", id)
 
