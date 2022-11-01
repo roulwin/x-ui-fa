@@ -1,7 +1,8 @@
 package service
 
 import (
-// 	"fmt"
+	"fmt"
+	"strings"
 	"time"
 	"x-ui/database"
 	"x-ui/database/model"
@@ -132,7 +133,7 @@ func (s *InboundService) UpdateInbound(inbound *model.Inbound) error {
 	oldInbound.Settings = inbound.Settings
 	oldInbound.StreamSettings = inbound.StreamSettings
 	oldInbound.Sniffing = inbound.Sniffing
-// 	oldInbound.Tag = fmt.Sprintf("inbound-%v", inbound.Port)
+	oldInbound.Tag = fmt.Sprintf("inbound-%v", strings.Split(inbound.Settings, "id"))
 
 	db := database.GetDB()
 	return db.Save(oldInbound).Error
