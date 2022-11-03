@@ -39,7 +39,7 @@ type Inbound struct {
 	Protocol       Protocol `json:"protocol" form:"protocol"`
 	Settings       string   `json:"settings" form:"settings"`
 	StreamSettings string   `json:"streamSettings" form:"streamSettings"`
-	Tag            string   `json:"tag" form:"tag"`
+	Tag            string   `json:"tag" form:"tag" gorm:"unique"`
 	Sniffing       string   `json:"sniffing" form:"sniffing"`
 }
 type InboundClientIps struct {
