@@ -21,7 +21,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var trafficRegex = regexp.MustCompile("(inbound|outbound)>>>([^>]+)>>>traffic>>>(downlink|uplink)")
+var trafficRegex = regexp.MustCompile("(inbound|outbound)>>>(<email>[^>]+)>>>traffic>>>(downlink|uplink)")
 
 func GetBinaryName() string {
 	return fmt.Sprintf("xray-%s-%s", runtime.GOOS, runtime.GOARCH)
@@ -142,7 +142,7 @@ func (p *process) refreshVersion() {
 
 func (p *process) Start() (err error) {
 	if p.IsRunning() {
-		return errors.New("سرویس در حال اجرا")
+		return errors.New("xray is already running")
 	}
 
 	defer func() {
@@ -153,12 +153,12 @@ func (p *process) Start() (err error) {
 
 	data, err := json.MarshalIndent(p.config, "", "  ")
 	if err != nil {
-		return common.NewErrorf("نمایه سرویس ایجاد نشد: %v", err)
+		return common.NewErrorf("生成 xray 配置文件失败: %v", err)
 	}
 	configPath := GetConfigPath()
 	err = os.WriteFile(configPath, data, fs.ModePerm)
 	if err != nil {
-		return common.NewErrorf("نوشتن فایل پیکربندی انجام نشد: %v", err)
+		return common.NewErrorf("写入配置文件失败: %v", err)
 	}
 
 	cmd := exec.Command(GetBinaryPath(), "-c", configPath)
@@ -224,14 +224,14 @@ func (p *process) Start() (err error) {
 
 func (p *process) Stop() error {
 	if !p.IsRunning() {
-		return errors.New("سرویس در حال اجرا نیست")
+		return errors.New("xray is not running")
 	}
 	return p.cmd.Process.Kill()
 }
 
 func (p *process) GetTraffic(reset bool) ([]*Traffic, error) {
 	if p.apiPort == 0 {
-		return nil, common.NewError("پورت سرویس اشتباه است:", p.apiPort)
+		return nil, common.NewError("xray api port wrong:", p.apiPort)
 	}
 	conn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%v", p.apiPort), grpc.WithInsecure())
 	if err != nil {
