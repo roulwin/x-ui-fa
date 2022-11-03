@@ -8,11 +8,24 @@ import (
 	"x-ui/database/model"
 	"x-ui/util/common"
 	"x-ui/xray"
-
+	"math/rand"
+	"strings"
 	"gorm.io/gorm"
 )
 
 type InboundService struct {
+}
+
+func randomString(length int) string {
+	rand.Seed(time.Now().UnixNano())
+	var alphabet string = "ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghigklmnopqrstuvwxyz0123456789"
+	var sb strings.Builder
+	l := len(alphabet)
+	for i := 0; i < length; i++ {
+		c := alphabet[rand.Intn(l)]
+		sb.WriteByte(c)
+	}
+	return sb.String()
 }
 
 func (s *InboundService) GetInbounds(userId int) ([]*model.Inbound, error) {
@@ -133,7 +146,7 @@ func (s *InboundService) UpdateInbound(inbound *model.Inbound) error {
 	oldInbound.Settings = inbound.Settings
 	oldInbound.StreamSettings = inbound.StreamSettings
 	oldInbound.Sniffing = inbound.Sniffing
-	oldInbound.Tag = fmt.Sprintf("inbound-%v", strings.Split(inbound.Settings, "id"))
+	oldInbound.Tag = fmt.Sprintf("inbound-%v", randomString(10))
 
 	db := database.GetDB()
 	return db.Save(oldInbound).Error
