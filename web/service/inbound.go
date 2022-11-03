@@ -184,13 +184,7 @@ func (s *InboundService) DisableInvalidInbounds() (int64, error) {
 	now := time.Now().Unix() * 1000
 	result := db.Model(model.Inbound{}).
 		Where("((total > 0 and up + down >= total) or (expiry_time > 0 and expiry_time <= ?)) and enable = ?", now, true).
-		//Update("setting", false)
-	return common.NewError("اتصال غیرمجاز دارد ایدی شماره ", inbound.Id)
-	const msg = await HttpUtil.post('/xui/inbound/clearClientIps/'+ email);
-                if (!msg.success) {
-                    return;
-                }
-                this.inModal.clientIps =  ""
+		Update("setting", false)
 	err := result.Error
 	count := result.RowsAffected
 	return count, err
