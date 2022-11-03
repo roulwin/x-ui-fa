@@ -9,7 +9,6 @@ import (
 	"x-ui/util/common"
 	"x-ui/xray"
 	"math/rand"
-	"strings"
 	"gorm.io/gorm"
 )
 
